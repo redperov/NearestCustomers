@@ -62,15 +62,13 @@ public class GeocodingLocation {
                         message.what = 2;
                     } else {
                         message.what = 1;
-                        Bundle bundle = new Bundle();
-
-                        bundle.putDouble("Latitude", latitude);
-                        bundle.putDouble("Longitude", longitude);
-                        message.setData(bundle);
-                        message.sendToTarget();
                     }
 
-
+                    Bundle bundle = new Bundle();
+                    bundle.putDouble("Latitude", latitude);
+                    bundle.putDouble("Longitude", longitude);
+                    message.setData(bundle);
+                    message.sendToTarget();
                 }
             }
         };
