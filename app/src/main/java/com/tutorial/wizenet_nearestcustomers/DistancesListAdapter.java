@@ -81,7 +81,7 @@ public class DistancesListAdapter extends BaseAdapter {
         city.setText(currentCustomer.getCity());
         address.setText(currentCustomer.getAddress());
 
-        fullAddress = String.format("%s %s", address, city);
+        fullAddress = String.format("%s %s", currentCustomer.getAddress(), currentCustomer.getCity());
 
         //Perform distance calculation.
         GeocodingLocation.getAddressFromLocation(fullAddress, context, new GeocoderHandler(origin, distance));
@@ -128,7 +128,7 @@ public class DistancesListAdapter extends BaseAdapter {
                 this.destination = new LatLng(latitude, longitude);
 
                 //Calculate distance from origin to specified destination.
-                JSONObject distance = calculateDistance();
+                JSONObject distance = calculateDistance(this.origin, this.destination);
 
                 try {
 
@@ -143,12 +143,12 @@ public class DistancesListAdapter extends BaseAdapter {
                 } catch (JSONException | NullPointerException e) {
                     e.printStackTrace();
 
-                    distanceTxt.setText("לא ניתן לחשב מרחק");
+                   // distanceTxt.setText("לא ניתן לחשב מרחק");
                 }
             }
         }
 
-        private JSONObject calculateDistance() {
+        private JSONObject calculateDistance(final LatLng origin, final LatLng destination) {
 
             final JSONObject[] distance = new JSONObject[1];
             // final String response;

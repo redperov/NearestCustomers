@@ -55,8 +55,8 @@ public class GeocodingLocation {
 
                     /*
                     Note:
-                    message.what  = 1: means everything is ok.
-                    message.what  = 2: means an error has occurred.
+                    message.what = 1: means everything is ok.
+                    message.what = 2: means an error has occurred.
                      */
                     if (!ok) {
                         message.what = 2;
