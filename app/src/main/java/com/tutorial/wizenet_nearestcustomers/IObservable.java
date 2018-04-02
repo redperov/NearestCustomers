@@ -1,10 +1,12 @@
 package com.tutorial.wizenet_nearestcustomers;
 
 /**
- * Created by Danny on 01/04/2018.
+ * Observable interface
  */
-
 public interface IObservable {
 
+    /**
+     * Notifies all the observers about a change.
+     */
     void notifyObservers();
 }

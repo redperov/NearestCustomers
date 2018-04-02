@@ -13,26 +13,33 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 /**
- * Created by Danny on 31/03/2018.
+ * Adapter for the nearest customer listView.
  */
-
 public class DistancesListAdapter extends BaseAdapter implements Filterable {
 
     private Context context;
     private LayoutInflater layoutInflater;
-    private ArrayList<Customer> customers;
-//    private LatLng origin;
 
-    public DistancesListAdapter(Context context, ArrayList<Customer> customers) {
+    //Customers list.
+    private ArrayList<CustomerTmp> customers;
+
+    /**
+     * Constructor.
+     * @param context context
+     * @param customers customers list
+     */
+    public DistancesListAdapter(Context context, ArrayList<CustomerTmp> customers) {
 
         this.layoutInflater = LayoutInflater.from(context);
         this.context = context;
         this.customers = customers;
-        //this.origin = origin;
-        //this.fragmentManager = fragmentManager;
     }
 
-    public void setCustomers(ArrayList<Customer> customers){
+    /**
+     * Customers list setter.
+     * @param customers customers list
+     */
+    public void setCustomers(ArrayList<CustomerTmp> customers){
 
         this.customers = customers;
     }
@@ -67,20 +74,13 @@ public class DistancesListAdapter extends BaseAdapter implements Filterable {
         TextView address = view.findViewById(R.id.customers_distances_row_address);
 
         //Get current customer.
-        Customer currentCustomer = this.customers.get(i);
+        CustomerTmp currentCustomer = this.customers.get(i);
 
         //Set customer values into the row.
         customerName.setText(currentCustomer.getName());
         city.setText(currentCustomer.getCity());
         address.setText(currentCustomer.getAddress());
         distance.setText(currentCustomer.getDistanceToUserText());
-
-//        //Perform distance calculation.
-//        new CustomGetHttp(new GeocoderHandler(origin, distance));
-
-//        //TODO delete this
-//        while(distance.getText() == "מרחק"){}
-        //GeocodingLocation.getAddressFromLocation(fullAddress, context, new GeocoderHandler(origin, distance));
 
         return view;
     }
@@ -93,7 +93,7 @@ public class DistancesListAdapter extends BaseAdapter implements Filterable {
             @Override
             protected void publishResults(CharSequence constraint, FilterResults results) {
 
-                customers = (ArrayList<Customer>) results.values;
+                customers = (ArrayList<CustomerTmp>) results.values;
                 notifyDataSetChanged();
             }
 
@@ -101,14 +101,14 @@ public class DistancesListAdapter extends BaseAdapter implements Filterable {
             protected FilterResults performFiltering(CharSequence constraint) {
 
                 FilterResults results = new FilterResults();
-                ArrayList<Customer> FilteredArrayNames = new ArrayList<>();
+                ArrayList<CustomerTmp> FilteredArrayNames = new ArrayList<>();
 
+                //Convert given distance in km to meters.
                 double maxDistance = Double.parseDouble(constraint.toString()) * 1000;
 
-                // perform your search here using the searchConstraint String.
-
+                //Filter the customers with distance higher than the maximum.
                 for (int i = 0; i < customers.size(); i++) {
-                    Customer customer = customers.get(i);
+                    CustomerTmp customer = customers.get(i);
                     if (customer.getDistanceToUserValue() <= maxDistance)  {
                         FilteredArrayNames.add(customer);
                     }
@@ -124,44 +124,4 @@ public class DistancesListAdapter extends BaseAdapter implements Filterable {
 
         return filter;
     }
-
-//    private class GeocoderHandler extends Handler {
-//
-//        private LatLng origin;
-//        private LatLng destination;
-//        private TextView distanceTextView;
-//
-//        public GeocoderHandler(LatLng origin, TextView distanceTxt) {
-//
-//            this.origin = origin;
-//            this.destination = null;
-//            this.distanceTextView = distanceTxt;
-//        }
-//
-//        @Override
-//        public void handleMessage(Message message) {
-//            //String locationAddress;
-//            String distanceText = null;
-//            String distanceValue = null;
-//            switch (message.what) {
-//                case 1:
-//                    Bundle bundle = message.getData();
-//                    distanceText = bundle.getString("Text");
-//                    distanceValue = bundle.getString("Value");
-//                    //locationAddress = String.format("%f %f", latitude, longitude);
-//                    break;
-//                case 2:
-//                    distanceText = null;
-//                    break;
-//                default:
-//                    distanceText = null;
-//            }
-//
-//            if (distanceText == null) {
-//              //  distanceTextView.setText("לא ניתן לחשב מרחק");
-//            } else {
-//                distanceTextView.setText(distanceText);
-//            }
-//        }
-//    }
 }

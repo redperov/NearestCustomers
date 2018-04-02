@@ -15,18 +15,25 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 
 /**
- * Created by Danny on 31/03/2018.
+ * The class creates a thread to execute an HTTP request to the Google Maps server,
+ * asking for the distance between the user and a given customer
  */
+public class GetDistanceHttp extends AsyncTask<String , Void ,String> {
 
-public class CustomGetHttp extends AsyncTask<String , Void ,String> {
+    //Server response.
     private String serverResponse;
+
+    //Handler that will handle the response.
     private Handler handler;
 
-    public CustomGetHttp(Handler handler){
+    /**
+     * Constructor.
+     * @param handler handler
+     */
+    public GetDistanceHttp(Handler handler){
         this.handler = handler;
     }
 
@@ -36,6 +43,7 @@ public class CustomGetHttp extends AsyncTask<String , Void ,String> {
         URL url;
         HttpURLConnection urlConnection = null;
 
+        //Perform an HTTP request.
         try {
             url = new URL(strings[0]);
             urlConnection = (HttpURLConnection) url.openConnection();
@@ -63,8 +71,17 @@ public class CustomGetHttp extends AsyncTask<String , Void ,String> {
         callHandler();
     }
 
+    /**
+     * Calls the handler to handle the response from the server.
+     */
     private void callHandler(){
 
+        /*
+        Contains the message code:
+        message.what = 1 : means everything is ok.
+        message.what = 2: means an error has occurred.
+        If what = 1, also contains the bundle with the distance.
+         */
         Message message = Message.obtain();
         message.setTarget(handler);
 
@@ -72,6 +89,7 @@ public class CustomGetHttp extends AsyncTask<String , Void ,String> {
         message.what = 1;
         JSONObject distanceJson = null;
 
+        //Extract data from returned Json.
         try{
             JSONObject jsonObject = new JSONObject(serverResponse.toString());
             JSONArray array = jsonObject.getJSONArray("routes");
@@ -86,6 +104,7 @@ public class CustomGetHttp extends AsyncTask<String , Void ,String> {
             //Distance in meters.
             double distanceValue = Double.parseDouble(distanceJson.getString("value"));
 
+            //Create the bundle which will contain the result.
             Bundle bundle = new Bundle();
             bundle.putString("Text", distanceText);
             bundle.putDouble("Value", distanceValue);
@@ -101,9 +120,15 @@ public class CustomGetHttp extends AsyncTask<String , Void ,String> {
             message.what = 2;
         }
 
+        //Send the message to the handler.
         message.sendToTarget();
     }
 
+    /**
+     * Reads the response to the HTTP request.
+     * @param in input stream
+     * @return HTTP response
+     */
     private String readStream(InputStream in) {
         BufferedReader reader = null;
         StringBuffer response = new StringBuffer();

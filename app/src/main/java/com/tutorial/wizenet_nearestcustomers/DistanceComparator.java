@@ -3,12 +3,11 @@ package com.tutorial.wizenet_nearestcustomers;
 import java.util.Comparator;
 
 /**
- * Created by Danny on 01/04/2018.
+ * Comparator used to compare between to users distances.
  */
-
-public class DistanceComparator implements Comparator<Customer> {
+public class DistanceComparator implements Comparator<CustomerTmp> {
     @Override
-    public int compare(Customer customer1, Customer customer2) {
+    public int compare(CustomerTmp customer1, CustomerTmp customer2) {
 
         if(customer1.getDistanceToUserValue() < customer2.getDistanceToUserValue()){
             return -1;

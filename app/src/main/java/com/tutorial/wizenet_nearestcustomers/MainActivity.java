@@ -22,9 +22,17 @@ public class MainActivity extends AppCompatActivity implements IObserver {
     private DistancesListAdapter adapter;
     private SeekBar seekBar;
     private TextView distanceText;
-    private ArrayList<Customer> customers;
+
+    //Customers list.
+    private ArrayList<CustomerTmp> customers;
+
+    //Counter used in the handler to count the number of tasks that were finished.
     private static int distancesCalculatedCounter;
+
+    //Initial seek bar cursor value.
     private final int INITIAL_PROGRESS = 10;
+
+    //API key used to address the Google Maps server.
     private final String API_KEY = "AIzaSyANBZWaAFBg_iSdpjkcapK3PZOi4ZtvXmI";
 
     @Override
@@ -33,22 +41,14 @@ public class MainActivity extends AppCompatActivity implements IObserver {
         setContentView(R.layout.activity_main);
 
 
-        //TODO before using this app: need to provide current user location and create an API key.
+        //TODO IMPORTANT: before using this app: need to provide current user location and create an API key.
 
-        /*
-          TODO if the large code is not working to convert address to LatLong, use:
-          Geocoder gc = new Geocoder(context);
-         if(gc.isPresent()){
-         List<Address> list = gc.getFromLocationName(“155 Park Theater, Palo Alto, CA”, 1);
-         Address address = list.get(0);
-         double lat = address.getLatitude();
-         double lng = address.getLongitude();
-         */
 
         this.seekBar = (SeekBar) findViewById(R.id.customers_distances_seekBar);
         this.distancesListView = (ListView) findViewById(R.id.customers_distances_listView);
         this.distanceText = (TextView) findViewById(R.id.customers_distances_distanceText);
 
+        //Sets the initial position of the seek bar cursor.
         this.seekBar.setProgress(INITIAL_PROGRESS);
 
         //Initializes the customers list.
@@ -57,6 +57,7 @@ public class MainActivity extends AppCompatActivity implements IObserver {
         //TODO The location values of the user, should be supplied from outside.
         LatLng origin = new LatLng(32.091412, 34.895811);
 
+        //Calculate distances from the user to the customers.
         boolean hasSucceeded = calculateDistancesToUser(origin);
 
         if (!hasSucceeded) {
@@ -66,7 +67,7 @@ public class MainActivity extends AppCompatActivity implements IObserver {
 
     private boolean calculateDistancesToUser(LatLng origin) {
 
-        for (Customer customer : this.customers) {
+        for (CustomerTmp customer : this.customers) {
 
             String destination = customer.getAddress() + customer.getCity();
 
@@ -80,7 +81,7 @@ public class MainActivity extends AppCompatActivity implements IObserver {
                         "&sensor=false&units=metric&mode=driving&key=" + API_KEY;
 
                 //Perform distance calculation.
-                new CustomGetHttp(new GeocoderHandler(this, origin, customer)).execute(strUrl);
+                new GetDistanceHttp(new GeocoderHandler(this, origin, customer)).execute(strUrl);
 
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
@@ -95,13 +96,13 @@ public class MainActivity extends AppCompatActivity implements IObserver {
     private void initializeCustomers() {
 
         this.customers = new ArrayList<>();
-        this.customers.add(new Customer("דדד", "אילת", "התמרים 1"));
-        this.customers.add(new Customer("משה כהן", "פתח תקווה", "חיים עוזר 1"));
-        this.customers.add(new Customer("בבב", "תל אביב", "דיזינגוף 5"));
-        this.customers.add(new Customer("ההה", "אילת", "התמרים 10"));
-        this.customers.add(new Customer("אאא", "תל אביב", "אלנבי 1"));
-        this.customers.add(new Customer("גגג", "נתניה", "הרצל 1"));
-        this.customers.add(new Customer("אבי כהן", "פתח תקווה", "הרצל 8"));
+        this.customers.add(new CustomerTmp("דדד", "אילת", "התמרים 1"));
+        this.customers.add(new CustomerTmp("משה כהן", "פתח תקווה", "חיים עוזר 1"));
+        this.customers.add(new CustomerTmp("בבב", "תל אביב", "דיזינגוף 5"));
+        this.customers.add(new CustomerTmp("ההה", "אילת", "התמרים 10"));
+        this.customers.add(new CustomerTmp("אאא", "תל אביב", "אלנבי 1"));
+        this.customers.add(new CustomerTmp("גגג", "נתניה", "הרצל 1"));
+        this.customers.add(new CustomerTmp("אבי כהן", "פתח תקווה", "הרצל 8"));
 
         distancesCalculatedCounter = this.customers.size();
     }
@@ -151,10 +152,10 @@ public class MainActivity extends AppCompatActivity implements IObserver {
 
         private LatLng origin;
         private LatLng destination;
-        private Customer customer;
+        private CustomerTmp customer;
         private IObserver observer;
 
-        public GeocoderHandler(IObserver observer, LatLng origin, Customer customer) {
+        public GeocoderHandler(IObserver observer, LatLng origin, CustomerTmp customer) {
 
             this.observer = observer;
             this.origin = origin;

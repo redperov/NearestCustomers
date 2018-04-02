@@ -1,10 +1,12 @@
 package com.tutorial.wizenet_nearestcustomers;
 
 /**
- * Created by Danny on 01/04/2018.
+ * Observer interface.
  */
-
 public interface IObserver {
 
+    /**
+     * Used by the observable to update the observer.
+     */
     void update();
 }
