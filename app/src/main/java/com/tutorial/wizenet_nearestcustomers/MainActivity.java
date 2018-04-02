@@ -24,12 +24,16 @@ public class MainActivity extends AppCompatActivity implements IObserver {
     private TextView distanceText;
     private ArrayList<Customer> customers;
     private static int distancesCalculatedCounter;
+    private final int INITIAL_PROGRESS = 10;
     private final String API_KEY = "AIzaSyANBZWaAFBg_iSdpjkcapK3PZOi4ZtvXmI";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
+        //TODO before using this app: need to provide current user location and create an API key.
 
         /*
           TODO if the large code is not working to convert address to LatLong, use:
@@ -45,6 +49,8 @@ public class MainActivity extends AppCompatActivity implements IObserver {
         this.distancesListView = (ListView) findViewById(R.id.customers_distances_listView);
         this.distanceText = (TextView) findViewById(R.id.customers_distances_distanceText);
 
+        this.seekBar.setProgress(INITIAL_PROGRESS);
+
         //Initializes the customers list.
         initializeCustomers();
 
@@ -56,32 +62,6 @@ public class MainActivity extends AppCompatActivity implements IObserver {
         if (!hasSucceeded) {
             Toast.makeText(this, "Failed to create all asyncTasks", Toast.LENGTH_SHORT).show();
         }
-
-        this.distanceText.setText(this.seekBar.getProgress() + " km");
-
-        this.seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-
-            int progressValue;
-
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-
-                progressValue = i;
-                distanceText.setText(progressValue + " km");
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-
-                distanceText.setText(progressValue + " km");
-            }
-        });
-
     }
 
     private boolean calculateDistancesToUser(LatLng origin) {
@@ -121,7 +101,7 @@ public class MainActivity extends AppCompatActivity implements IObserver {
         this.customers.add(new Customer("ההה", "אילת", "התמרים 10"));
         this.customers.add(new Customer("אאא", "תל אביב", "אלנבי 1"));
         this.customers.add(new Customer("גגג", "נתניה", "הרצל 1"));
-        this.customers.add(new Customer("אבי כהו", "פתח תקווה", "רוטשילד 8"));
+        this.customers.add(new Customer("אבי כהן", "פתח תקווה", "הרצל 8"));
 
         distancesCalculatedCounter = this.customers.size();
     }
@@ -134,6 +114,37 @@ public class MainActivity extends AppCompatActivity implements IObserver {
         adapter = new DistancesListAdapter(this, customers);
 
         distancesListView.setAdapter(adapter);
+
+        this.distanceText.setText(this.seekBar.getProgress() + " km");
+        adapter.getFilter().filter(Integer.toString(INITIAL_PROGRESS));
+        adapter.setCustomers(customers);
+
+        this.seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+
+            int progressValue;
+
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+
+                progressValue = i;
+                distanceText.setText(progressValue + " km");
+                adapter.getFilter().filter(Integer.toString(progressValue));
+                adapter.setCustomers(customers);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+                distanceText.setText(progressValue + " km");
+               // adapter.getFilter().filter(Integer.toString(progressValue));
+            }
+        });
+
     }
 
     private class GeocoderHandler extends Handler implements IObservable {

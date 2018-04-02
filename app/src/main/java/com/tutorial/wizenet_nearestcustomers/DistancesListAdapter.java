@@ -1,10 +1,13 @@
 package com.tutorial.wizenet_nearestcustomers;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -13,7 +16,7 @@ import java.util.ArrayList;
  * Created by Danny on 31/03/2018.
  */
 
-public class DistancesListAdapter extends BaseAdapter {
+public class DistancesListAdapter extends BaseAdapter implements Filterable {
 
     private Context context;
     private LayoutInflater layoutInflater;
@@ -27,6 +30,11 @@ public class DistancesListAdapter extends BaseAdapter {
         this.customers = customers;
         //this.origin = origin;
         //this.fragmentManager = fragmentManager;
+    }
+
+    public void setCustomers(ArrayList<Customer> customers){
+
+        this.customers = customers;
     }
 
     @Override
@@ -75,6 +83,46 @@ public class DistancesListAdapter extends BaseAdapter {
         //GeocodingLocation.getAddressFromLocation(fullAddress, context, new GeocoderHandler(origin, distance));
 
         return view;
+    }
+
+    @Override
+    public Filter getFilter() {
+        Filter filter = new Filter() {
+
+            @SuppressWarnings("unchecked")
+            @Override
+            protected void publishResults(CharSequence constraint, FilterResults results) {
+
+                customers = (ArrayList<Customer>) results.values;
+                notifyDataSetChanged();
+            }
+
+            @Override
+            protected FilterResults performFiltering(CharSequence constraint) {
+
+                FilterResults results = new FilterResults();
+                ArrayList<Customer> FilteredArrayNames = new ArrayList<>();
+
+                double maxDistance = Double.parseDouble(constraint.toString()) * 1000;
+
+                // perform your search here using the searchConstraint String.
+
+                for (int i = 0; i < customers.size(); i++) {
+                    Customer customer = customers.get(i);
+                    if (customer.getDistanceToUserValue() <= maxDistance)  {
+                        FilteredArrayNames.add(customer);
+                    }
+                }
+
+                results.count = FilteredArrayNames.size();
+                results.values = FilteredArrayNames;
+                Log.e("myTag", "Filter results: " + results.values.toString());
+
+                return results;
+            }
+        };
+
+        return filter;
     }
 
 //    private class GeocoderHandler extends Handler {
